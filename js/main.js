@@ -11,14 +11,14 @@ function gerarArquivoJson(){
         let produtos = result.products;
         let categoria = result.categories;
         let construirJson = "";  
-        let lista = [];
+        let listaDeStrings = [];
         let mediasDosEstabelecimentos = [];
 
         // Percorre a lista de estabelecimentos
         estabelecimento.forEach(function(nome, indiceEstabelecimento){
             let construindoString = "";
             let totalDeProdutosDoEstabelecimento = estabelecimento[indiceEstabelecimento].productsId.length;
-            let somaDosPrecosDosProdutosDoEstabelecimento = 0;           
+            let somaDosPrecos = 0;           
             let nomeDoEstabelecimento = estabelecimento[indiceEstabelecimento].name;
             let produtosDoEstabelecimento = estabelecimento[indiceEstabelecimento].productsId;
               
@@ -33,14 +33,14 @@ function gerarArquivoJson(){
 
                     // Entra nesta condição o produto que estiver disponivel no estabelecimento, soma e atribui os valores na variável com o total da soma dos produtos
                     if(idDoProdutoDoEstabelecimento === idDoProduto){
-                        somaDosPrecosDosProdutosDoEstabelecimento += precoDoProduto;
+                        somaDosPrecos += precoDoProduto;
                     }
                 })
 
             })
 
             // Calcular média da soma dos preços de todos os produtos
-            let avgPrice = ((somaDosPrecosDosProdutosDoEstabelecimento / totalDeProdutosDoEstabelecimento)/100).toFixed(2);
+            let avgPrice = ((somaDosPrecos / totalDeProdutosDoEstabelecimento)/100).toFixed(2);
             mediasDosEstabelecimentos.push(avgPrice);
             // Atribui e concatena na variavel que contém a construção da string com todos os dados para gerar o arquivo json
             construindoString += `\n    "${nomeDoEstabelecimento}": {\n       "avgPrice": ${avgPrice},`;
@@ -95,22 +95,24 @@ function gerarArquivoJson(){
             })
             
            
-            let objeto = { estabelecimentoString: construindoString, media: avgPrice }
-            lista.push(objeto);
+            let stringEMediaDosEstabelecimentos = { estabelecimentoString: construindoString, media: avgPrice }
+            listaDeStrings.push(stringEMediaDosEstabelecimentos);
         })
 
+        // Ordena, de forma decrescente, o array com as médias da soma dos produtos de todos os estabelecimentos
         function sortfunction(a, b){
              return (a - b) 
         }
         mediasDosEstabelecimentos.sort(sortfunction);
         mediasDosEstabelecimentos.reverse();
 
+        //Compara as médias dos arrays com as médias dos estabelecimentos e faz a construção da string em ordem descrescente 
         mediasDosEstabelecimentos.forEach(function(nome, indiceDaMedia){
             let mediaAtual = mediasDosEstabelecimentos[indiceDaMedia];
 
-            lista.forEach(function(nome, indiceDaLista){
-                if(lista[indiceDaLista].media === mediaAtual){
-                    construirJson += lista[indiceDaLista].estabelecimentoString;
+            listaDeStrings.forEach(function(nome, indiceDaLista){
+                if(listaDeStrings[indiceDaLista].media === mediaAtual){
+                    construirJson += listaDeStrings[indiceDaLista].estabelecimentoString;
                 }
             })
         })
