@@ -1,0 +1,32 @@
+body{
+    background-color: rgb(21, 21, 36);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#titulo-da-pagina{
+    font-size: 50px;
+    color:  rgb(158, 158, 224);
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.botao-gerar-arquivo{
+    width: 260px;
+    height: 50px;
+
+    border-radius: 25px;
+    font-size: 20px;
+    border: none;
+    font-weight: bold;
+    color: rgb(21, 21, 36);
+    background-color: rgb(158, 158, 224);
+}
+
+.botao-gerar-arquivo:hover{
+    background-color:  rgb(158, 158, 224);
+    color: rgb(21, 21, 36);
+    transition: 200ms;
+    transform: scale(1.05);
+    
+}
