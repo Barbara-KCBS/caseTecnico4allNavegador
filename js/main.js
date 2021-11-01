@@ -43,13 +43,13 @@ function gerarArquivoJson(){
             let avgPrice = ((somaDosPrecos / totalDeProdutosDoEstabelecimento)/100).toFixed(2);
             mediasDosEstabelecimentos.push(avgPrice);
             // Atribui e concatena na variavel que contém a construção da string com todos os dados para gerar o arquivo json
-            construindoString += `\n    "${nomeDoEstabelecimento}": {\n       "avgPrice": "${avgPrice}",`;
+            construindoString += `"${nomeDoEstabelecimento}":{"avgPrice":"${avgPrice}",`;
 
             // Percorre todas as categorias do arquivo json
             categoria.forEach(function(nome, indiceDacategoria){
                 let idDacategoria = categoria[indiceDacategoria].id;
                 let nomeDaCategoria = categoria[indiceDacategoria].name;
-                let categoriaComProduto = `\n       "${nomeDaCategoria}": {`;
+                let categoriaComProduto = `"${nomeDaCategoria}":{`;
                 let localizouProdutoNoEstabelecimento = false;
                 
                 // Percorre todos os produtos do arquivo json
@@ -73,7 +73,7 @@ function gerarArquivoJson(){
                                 // Entra nesta condição quando encontrar a categoria que o produto pertence
                                 if(idDaCategoriaDoProdutoDoEstabelecimento === idDacategoria){
                                     localizouProdutoNoEstabelecimento = true;                                                       
-                                    categoriaComProduto += `\n          "${nomeDoProduto}": { \n             "price": "${precoDoProduto}"\n          },` 
+                                    categoriaComProduto += `"${nomeDoProduto}":{"price": "${precoDoProduto}"},` 
                                                                        
                                 }
                             })
@@ -83,12 +83,12 @@ function gerarArquivoJson(){
 
                 if(localizouProdutoNoEstabelecimento === true){                                             
                     categoriaComProduto = categoriaComProduto.substring(0, categoriaComProduto.length - 1);
-                    construindoString += `${categoriaComProduto}\n       },`;  
+                    construindoString += `${categoriaComProduto}},`;  
                 }
 
                 if(indiceDacategoria === categoria.length - 1){
                     construindoString = construindoString.substring(0, construindoString.length - 1);
-                    construindoString += "\n    },"
+                    construindoString += "},"
                 }
                
                 
@@ -119,7 +119,10 @@ function gerarArquivoJson(){
 
         construirJson = construirJson.substring(0, construirJson.length - 1); 
 
-        let jsonString = `{${construirJson}\n}`;
+        let jsonString = `{${construirJson}}`;
+        jsonString = JSON.parse(jsonString);
+        jsonString = JSON.stringify(jsonString, null, 3);
+
         let nomeDoArquivo = "caseTecnico4All";
         let blob = new Blob([jsonString], {type: "text/plain;charset=utf-8"})
         saveAs(blob, nomeDoArquivo + ".json");
