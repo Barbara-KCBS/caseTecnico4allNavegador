@@ -43,7 +43,7 @@ function gerarArquivoJson(){
             let avgPrice = ((somaDosPrecos / totalDeProdutosDoEstabelecimento)/100).toFixed(2);
             mediasDosEstabelecimentos.push(avgPrice);
             // Atribui e concatena na variavel que contém a construção da string com todos os dados para gerar o arquivo json
-            construindoString += `\n    "${nomeDoEstabelecimento}": {\n       "avgPrice": ${avgPrice},`;
+            construindoString += `\n    "${nomeDoEstabelecimento}": {\n       "avgPrice": "${avgPrice}",`;
 
             // Percorre todas as categorias do arquivo json
             categoria.forEach(function(nome, indiceDacategoria){
