@@ -10,27 +10,27 @@ function gerarArquivoJson(){
         let estabelecimento = result.establishments;
         let produtos = result.products;
         let categoria = result.categories;
-        let construindoJson = "";  
-        let listaDeStrings = [];
-        let mediasDosEstabelecimentos = [];
+        var construindoJson = "";  
+        var listaDeStringsDosEstabelecimentos = [];
+        var mediasDosEstabelecimentos = [];
         
         // Percorre a lista de estabelecimentos
         estabelecimento.forEach(function(nome, indiceEstabelecimento){
-            let construindoString = "";
+            let construcaoDaString = "";
             let totalDeProdutosDoEstabelecimento = estabelecimento[indiceEstabelecimento].productsId.length;
-            let precoDeTodosOsProdutos = [];
+            let produtosComPrecos = [];
             let somaDosPrecos = 0;           
             let nomeDoEstabelecimento = estabelecimento[indiceEstabelecimento].name;
             let produtosDoEstabelecimento = estabelecimento[indiceEstabelecimento].productsId;
-          
-            // Percorre todas as categorias do arquivo json
+           
+            // Percorre todas as categorias do arquivo data.json
             categoria.forEach(function(nome, indiceDacategoria){
                 let idDacategoria = categoria[indiceDacategoria].id;
                 let nomeDaCategoria = categoria[indiceDacategoria].name;
                 let categoriaComProduto = `"${nomeDaCategoria}":{`;
                 let localizouProdutoNoEstabelecimento = false;
                 
-                // Percorre todos os produtos do arquivo json
+                // Percorre todos os produtos do arquivo data.json
                 produtos.forEach(function(nome, indiceDeProdutos){
         
                     let idDoProduto = produtos[indiceDeProdutos].id; 
@@ -50,8 +50,7 @@ function gerarArquivoJson(){
                                 
                                 // Entra nesta condição quando encontrar a categoria que o produto pertence
                                 if(idDaCategoriaDoProdutoDoEstabelecimento === idDacategoria){
-                                    precoDeTodosOsProdutos.push(precoDoProduto);
-                                    precoDeTodosOsProdutos = [...new Set(precoDeTodosOsProdutos)];
+                                    produtosComPrecos.push({ produto: nomeDoProduto, preco: precoDoProduto});
                                     localizouProdutoNoEstabelecimento = true;                                                       
                                     categoriaComProduto += `"${nomeDoProduto}":{"price": "${(precoDoProduto/100).toFixed(2)}"},` 
                                                                        
@@ -64,33 +63,39 @@ function gerarArquivoJson(){
         
                 if(localizouProdutoNoEstabelecimento === true){                                             
                     categoriaComProduto = categoriaComProduto.substring(0, categoriaComProduto.length - 1);
-                    construindoString += `${categoriaComProduto}},`;  
+                    construcaoDaString += `${categoriaComProduto}},`;  
                 }
         
                 if(indiceDacategoria === categoria.length - 1){
-                    construindoString = construindoString.substring(0, construindoString.length - 1);
-                    construindoString += "},"
+                    construcaoDaString = construcaoDaString.substring(0, construcaoDaString.length - 1);
+                    construcaoDaString += "},"
                 }
                
                 
             })
-             // Soma os todos os preços dos produtos do estabelecimento e calcula sua média
-            precoDeTodosOsProdutos.forEach(function(nome, i){
-                somaDosPrecos += precoDeTodosOsProdutos[i];
+        
+            // Filtra produtos repetidos e exclui da lista de produtos com preços
+            produtosComPrecos = produtosComPrecos.filter(function (a) {
+                return !this[JSON.stringify(a)] && (this[JSON.stringify(a)] = true);
+            }, Object.create(null))
+            
+            // Soma todos os preços dos produtos do estabelecimento e calcula sua média
+            produtosComPrecos.forEach(function(nome, i){
+                somaDosPrecos += produtosComPrecos[i].preco;
             })
         
             let avgPrice = ((somaDosPrecos / totalDeProdutosDoEstabelecimento)/100).toFixed(2);
             mediasDosEstabelecimentos.push(avgPrice);
         
             // conclusão da string com os dados de determinado estabelecimento
-            let construcaoConcluida =  `"${nomeDoEstabelecimento}":{"avgPrice":"${avgPrice}", ${construindoString}`;
-            let stringEMediaDosEstabelecimentos = { estabelecimentoString: construcaoConcluida, media: avgPrice }
-            listaDeStrings.push(stringEMediaDosEstabelecimentos);
+            construcaoDaString =  `"${nomeDoEstabelecimento}":{"avgPrice":"${avgPrice}", ${construcaoDaString}`;
+            let stringEMediaDosEstabelecimentos = { estabelecimentoString: construcaoDaString, media: avgPrice }
+            listaDeStringsDosEstabelecimentos.push(stringEMediaDosEstabelecimentos);
         })
         
         
         
-        // Ordena, de forma decrescente, o array com as médias da soma dos produtos de todos os estabelecimentos
+        // Ordena, de forma decrescente, o array com a média dos valores de todos os produtos de um estabelecimento
         function sortfunction(a, b){
              return (a - b) 
         }
@@ -101,15 +106,14 @@ function gerarArquivoJson(){
         mediasDosEstabelecimentos.forEach(function(nome, indiceDaMedia){
             let mediaAtual = mediasDosEstabelecimentos[indiceDaMedia];
         
-            listaDeStrings.forEach(function(nome, indiceDaLista){
-                if(listaDeStrings[indiceDaLista].media === mediaAtual){
-                    construindoJson += listaDeStrings[indiceDaLista].estabelecimentoString;
+            listaDeStringsDosEstabelecimentos.forEach(function(nome, indiceDaLista){
+                if(listaDeStringsDosEstabelecimentos[indiceDaLista].media === mediaAtual){
+                    construindoJson += listaDeStringsDosEstabelecimentos[indiceDaLista].estabelecimentoString;
                 }
             })
         })
         
         construindoJson = construindoJson.substring(0, construindoJson.length - 1); 
-        
         construindoJson = `{${construindoJson}}`;
         construindoJson = JSON.parse(construindoJson);
         construindoJson = JSON.stringify(construindoJson, null, 3);
